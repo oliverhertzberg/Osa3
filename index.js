@@ -3,6 +3,11 @@ const app = express()
 
 app.use(express.json())
 
+const idGenerator = () => {
+    const newID = (Math.round( 9007199254740991*Math.random()))
+    return newID
+}
+
 let persons = [
     { 
       id: 1,
@@ -58,6 +63,25 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+
+    if(!body.name){
+        return response.status(404).json({
+            error: 'no name found'
+        })
+    }
+
+    person = {
+        id: idGenerator(),
+        name: body.name,
+        number: body.number,
+    }
+
+    persons = persons.concat(person)
+
+    response.json(person)
+})
 
 
 
