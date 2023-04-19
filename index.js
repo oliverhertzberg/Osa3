@@ -65,12 +65,17 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
+    const namesMap = persons.map(p => p.name)
 
-    if(!body.name){
-        return response.status(404).json({
-            error: 'no name found'
-        })
-    }
+    if(!body.name) {
+        return response.status(400).json({ error: 'Name is missing' }
+    )}
+    if(!body.number){
+        response.status(400).json({ error: 'Number is missing' }
+    )}
+    if(namesMap.includes(body.name)) {
+        response.status(400).json({ error: 'Name must be unique' }
+    )}
 
     person = {
         id: idGenerator(),
