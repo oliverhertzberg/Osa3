@@ -3,7 +3,18 @@ const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+
+// En saanut toimimaan..
+// app.use(morgan(':method :url :status :response[content-length] - :response-time ms :body', {
+//     skip: (request, response) => {
+//         return request.method !== 'POST' || response.statusCode !== 200;
+//     },
+//     stream: process.stdout,
+//     body: (request) => {
+//         return JSON.stringify(request.body);
+//     },
+// }))
+
 
 const idGenerator = () => {
     const newID = (Math.round( 9007199254740991*Math.random()))
@@ -34,12 +45,12 @@ let persons = [
 ]
 
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', morgan('tiny'), (request, response) => {
     console.log(persons)
     response.json(persons)
 })
 
-app.get('/api/info', (request, response) => {
+app.get('/api/info', morgan('tiny'), (request, response) => {
     const currentTime = new Date()
     const personCount = persons.length
 
@@ -50,7 +61,7 @@ app.get('/api/info', (request, response) => {
     )
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', morgan('tiny'), (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(p => p.id === id)
 
@@ -58,7 +69,7 @@ app.get('/api/persons/:id', (request, response) => {
     : response.status(404).end()
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', morgan('tiny'), (request, response) => {
     const id = Number(request.params.id)
     persons = persons.filter(p => p.id !== id)
 
@@ -67,7 +78,9 @@ app.delete('/api/persons/:id', (request, response) => {
 
 })
 
-app.post('/api/persons', (request, response) => {
+morgan.token('body', (request) => JSON.stringify(request.body));
+
+app.post('/api/persons',morgan(':method :url :status :res[content-length] - :response-time ms :body'), (request, response) => {
     const body = request.body
     const namesMap = persons.map(p => p.name)
 
@@ -91,6 +104,8 @@ app.post('/api/persons', (request, response) => {
 
     response.json(person)
 })
+
+
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({error: 'unknown endpoint'})
