@@ -61,6 +61,8 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(p => p.id !== id)
 
     response.status(204).end()
+
+
 })
 
 app.post('/api/persons', (request, response) => {
@@ -71,10 +73,10 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({ error: 'Name is missing' }
     )}
     if(!body.number){
-        response.status(400).json({ error: 'Number is missing' }
+        return response.status(400).json({ error: 'Number is missing' }
     )}
     if(namesMap.includes(body.name)) {
-        response.status(400).json({ error: 'Name must be unique' }
+        return response.status(400).json({ error: 'Name must be unique' }
     )}
 
     person = {
